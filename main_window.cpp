@@ -48,6 +48,12 @@ main_window::main_window()
     setup_search_menu();
     setup_tools_menu();
 
+    checker.load_words("data/words.txt");
+
+    highlighter = new spell_checker_highlighter(
+            editor->document(),
+            &checker);
+
     // TODO: uncomment the line below after bringing code from the previous assignments.
     // update_status_bar();
 }

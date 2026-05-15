@@ -1,5 +1,8 @@
+#include "spell_checker.h"
+#include "spell_checker_highlighter.h"
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
+
 
 #include "text_transform.h"
 
@@ -33,6 +36,10 @@ private:
     void save_file();
     void save_file_as();
     void update_title();
+    void show_word_frequency() const;
+
+    spell_checker checker;
+    spell_checker_highlighter* highlighter;
 
     // TODO: bring the status bar management code from the previous assignments.
 
