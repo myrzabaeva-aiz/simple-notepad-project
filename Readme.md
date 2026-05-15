@@ -21,6 +21,23 @@ A desktop notepad application built with C++ and Qt6 for the Object-Oriented Pro
 - Font color picker
 - Zoom in / zoom out support
 
+## Screenshots
+
+### Main Window
+![Main Window](screenshots/main_window.png)
+
+### Spell Checker
+![Spell Checker](screenshots/spell_checker.png)
+
+### Color Picker
+![Color Picker](screenshots/color_picker.png)
+
+### Find and Replace
+![Find and Replace](screenshots/find_replace.png)
+
+### Status Bar
+![Status Bar](screenshots/status_bar.png)
+
 ## Technologies
 - C++
 - Qt6

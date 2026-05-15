@@ -63,11 +63,9 @@ main_window::main_window() {
             &checker);
 
 
-
 }
 
-void main_window::update_status_bar() const
-{
+void main_window::update_status_bar() const {
     const QString text = editor->toPlainText();
 
     const int chars = text.length();
@@ -93,6 +91,7 @@ void main_window::update_status_bar() const
                     .arg(line)
                     .arg(column));
 }
+
 main_window::~main_window() = default;
 
 void main_window::setup_file_menu() {
@@ -175,7 +174,7 @@ void main_window::setup_format_menu() {
     }
     format_menu->addSeparator();
 
-    auto* action_font = format_menu->addAction("Font...");
+    auto *action_font = format_menu->addAction("Font...");
 
     connect(action_font, &QAction::triggered,
             this, [this] {
@@ -192,7 +191,7 @@ void main_window::setup_format_menu() {
                     editor->setCurrentFont(font);
                 }
             });
-    auto* action_color = format_menu->addAction("Text Color...");
+    auto *action_color = format_menu->addAction("Text Color...");
 
     connect(action_color, &QAction::triggered,
             this, [this] {
@@ -519,13 +518,13 @@ void main_window::show_word_frequency() {
 
     dialog->exec();
 }
-void main_window::setup_view_menu()
-{
-    auto* view_menu = menuBar()->addMenu("View");
 
-    auto* zoom_in = view_menu->addAction("Zoom In");
-    auto* zoom_out = view_menu->addAction("Zoom Out");
-    auto* reset_zoom = view_menu->addAction("Reset Zoom");
+void main_window::setup_view_menu() {
+    auto *view_menu = menuBar()->addMenu("View");
+
+    auto *zoom_in = view_menu->addAction("Zoom In");
+    auto *zoom_out = view_menu->addAction("Zoom Out");
+    auto *reset_zoom = view_menu->addAction("Reset Zoom");
 
     connect(zoom_in, &QAction::triggered,
             this, [this] {
