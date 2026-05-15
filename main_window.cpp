@@ -46,6 +46,7 @@ main_window::main_window() {
     setup_format_toolbar();
     setup_search_menu();
     setup_tools_menu();
+    setup_view_menu();
 
     statusBar()->showMessage("Ready");
 
@@ -185,6 +186,20 @@ void main_window::setup_format_menu() {
 
                 if (ok) {
                     editor->setCurrentFont(font);
+                }
+            });
+    auto* action_color = format_menu->addAction("Text Color...");
+
+    connect(action_color, &QAction::triggered,
+            this, [this] {
+
+                QColor color =
+                        QColorDialog::getColor(
+                                editor->textColor(),
+                                this);
+
+                if (color.isValid()) {
+                    editor->setTextColor(color);
                 }
             });
 }
@@ -500,4 +515,31 @@ void main_window::show_word_frequency() {
     ui.frequency_table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 
     dialog->exec();
+}
+void main_window::setup_view_menu()
+{
+    auto* view_menu = menuBar()->addMenu("View");
+
+    auto* zoom_in = view_menu->addAction("Zoom In");
+    auto* zoom_out = view_menu->addAction("Zoom Out");
+    auto* reset_zoom = view_menu->addAction("Reset Zoom");
+
+    connect(zoom_in, &QAction::triggered,
+            this, [this] {
+                editor->zoomIn(2);
+            });
+
+    connect(zoom_out, &QAction::triggered,
+            this, [this] {
+                editor->zoomOut(2);
+            });
+
+    connect(reset_zoom, &QAction::triggered,
+            this, [this] {
+
+                QFont font;
+                font.setPointSize(12);
+
+                editor->setFont(font);
+            });
 }

@@ -1,6 +1,8 @@
 #include "spell_checker.h"
 #include "spell_checker_highlighter.h"
 #include <QFontDialog>
+#include <QColorDialog>
+
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
@@ -32,6 +34,7 @@ private:
     void setup_format_toolbar();
     void setup_search_menu();
     void setup_tools_menu();
+    void setup_view_menu();
 
     void open_file();
     void save_file();
