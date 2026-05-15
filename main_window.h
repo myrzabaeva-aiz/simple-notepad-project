@@ -1,5 +1,6 @@
 #include "spell_checker.h"
 #include "spell_checker_highlighter.h"
+#include <QFontDialog>
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 

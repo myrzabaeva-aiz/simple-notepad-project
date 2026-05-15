@@ -168,6 +168,25 @@ void main_window::setup_format_menu() {
             apply_transform(*transform);
         });
     }
+    format_menu->addSeparator();
+
+    auto* action_font = format_menu->addAction("Font...");
+
+    connect(action_font, &QAction::triggered,
+            this, [this] {
+
+                bool ok;
+
+                QFont font =
+                        QFontDialog::getFont(
+                                &ok,
+                                editor->currentFont(),
+                                this);
+
+                if (ok) {
+                    editor->setCurrentFont(font);
+                }
+            });
 }
 
 void main_window::setup_format_toolbar() {
