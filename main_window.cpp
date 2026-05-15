@@ -56,7 +56,7 @@ main_window::main_window() {
 
     update_status_bar();
 
-    checker.load_words("data/words.txt");
+    checker.load_words("../data/words.txt");
 
     highlighter = new spell_checker_highlighter(
             editor->document(),
@@ -212,7 +212,7 @@ void main_window::setup_format_toolbar() {
     auto *toolbar = addToolBar("Format");
     toolbar->setIconSize(QSize(16, 16));
 
-    auto *action_bold = toolbar->addAction(QIcon("data/images/bold.svg"), "Bold");
+    auto *action_bold = toolbar->addAction(QIcon("../data/images/bold.svg"), "Bold");
     action_bold->setCheckable(true);
     action_bold->setShortcut(QKeySequence("Ctrl+B"));
     connect(action_bold, &QAction::triggered, this, [this](const bool checked) {
@@ -221,7 +221,7 @@ void main_window::setup_format_toolbar() {
         editor->mergeCurrentCharFormat(fmt);
     });
 
-    auto *action_italic = toolbar->addAction(QIcon("data/images/italic.svg"), "Italic");
+    auto *action_italic = toolbar->addAction(QIcon("../data/images/italic.svg"), "Italic");
     action_italic->setCheckable(true);
     action_italic->setShortcut(QKeySequence("Ctrl+I"));
     connect(action_italic, &QAction::triggered, this, [this](const bool checked) {
@@ -230,7 +230,7 @@ void main_window::setup_format_toolbar() {
         editor->mergeCurrentCharFormat(fmt);
     });
 
-    auto *action_underline = toolbar->addAction(QIcon("data/images/underline.svg"), "Underline");
+    auto *action_underline = toolbar->addAction(QIcon("../data/images/underline.svg"), "Underline");
     action_underline->setCheckable(true);
     action_underline->setShortcut(QKeySequence("Ctrl+U"));
     connect(action_underline, &QAction::triggered, this, [this](const bool checked) {
