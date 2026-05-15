@@ -27,8 +27,7 @@
 #include <utility>
 #include <vector>
 
-main_window::main_window()
-{
+main_window::main_window() {
     setWindowTitle("Notepad");
     resize(800, 600);
 
@@ -48,6 +47,14 @@ main_window::main_window()
     setup_search_menu();
     setup_tools_menu();
 
+    statusBar()->showMessage("Ready");
+
+    connect(editor, &QTextEdit::textChanged, this, [this]() {
+        update_status_bar();
+    });
+
+    update_status_bar();
+
     checker.load_words("data/words.txt");
 
     highlighter = new spell_checker_highlighter(
@@ -56,15 +63,33 @@ main_window::main_window()
 
     // TODO: uncomment the line below after bringing code from the previous assignments.
     // update_status_bar();
+
+
+}
+
+void main_window::update_status_bar() const {
+    const QString text = editor->toPlainText();
+
+    const int chars = text.length();
+
+    const QStringList words =
+            text.split(QRegularExpression("\\s+"),
+                       Qt::SkipEmptyParts);
+
+    const int word_count = words.size();
+
+    statusBar()->showMessage(
+            QString("Words: %1 | Characters: %2")
+                    .arg(word_count)
+                    .arg(chars));
 }
 
 main_window::~main_window() = default;
 
-void main_window::setup_file_menu()
-{
-    auto* file_menu = menuBar()->addMenu("File");
+void main_window::setup_file_menu() {
+    auto *file_menu = menuBar()->addMenu("File");
 
-    const auto* action_new = file_menu->addAction("New");
+    const auto *action_new = file_menu->addAction("New");
     connect(action_new, &QAction::triggered, this, [this] {
         editor->clear();
         current_file.clear();
@@ -73,58 +98,57 @@ void main_window::setup_file_menu()
 
     file_menu->addSeparator();
 
-    const auto* action_open = file_menu->addAction("Open...");
+    const auto *action_open = file_menu->addAction("Open...");
     connect(action_open, &QAction::triggered, this, [this] {
         open_file();
     });
 
-    const auto* action_save = file_menu->addAction("Save");
+    const auto *action_save = file_menu->addAction("Save");
     connect(action_save, &QAction::triggered, this, [this] {
         save_file();
     });
 
-    const auto* action_save_as = file_menu->addAction("Save As...");
+    const auto *action_save_as = file_menu->addAction("Save As...");
     connect(action_save_as, &QAction::triggered, this, [this] {
         save_file_as();
     });
 
     file_menu->addSeparator();
 
-    const auto* action_exit = file_menu->addAction("Exit");
+    const auto *action_exit = file_menu->addAction("Exit");
     connect(action_exit, &QAction::triggered, this, [] {
         QApplication::quit();
     });
 }
 
-void main_window::setup_edit_menu()
-{
-    auto* edit_menu = menuBar()->addMenu("Edit");
+void main_window::setup_edit_menu() {
+    auto *edit_menu = menuBar()->addMenu("Edit");
 
-    auto* action_undo = edit_menu->addAction("Undo");
+    auto *action_undo = edit_menu->addAction("Undo");
     action_undo->setShortcut(QKeySequence::Undo);
     connect(action_undo, &QAction::triggered, editor, &QTextEdit::undo);
 
-    auto* action_redo = edit_menu->addAction("Redo");
+    auto *action_redo = edit_menu->addAction("Redo");
     action_redo->setShortcut(QKeySequence::Redo);
     connect(action_redo, &QAction::triggered, editor, &QTextEdit::redo);
 
     edit_menu->addSeparator();
 
-    auto* action_cut = edit_menu->addAction("Cut");
+    auto *action_cut = edit_menu->addAction("Cut");
     action_cut->setShortcut(QKeySequence::Cut);
     connect(action_cut, &QAction::triggered, editor, &QTextEdit::cut);
 
-    auto* action_copy = edit_menu->addAction("Copy");
+    auto *action_copy = edit_menu->addAction("Copy");
     action_copy->setShortcut(QKeySequence::Copy);
     connect(action_copy, &QAction::triggered, editor, &QTextEdit::copy);
 
-    auto* action_paste = edit_menu->addAction("Paste");
+    auto *action_paste = edit_menu->addAction("Paste");
     action_paste->setShortcut(QKeySequence::Paste);
     connect(action_paste, &QAction::triggered, editor, &QTextEdit::paste);
 
     edit_menu->addSeparator();
 
-    auto* action_select_all = edit_menu->addAction("Select All");
+    auto *action_select_all = edit_menu->addAction("Select All");
     action_select_all->setShortcut(QKeySequence::SelectAll);
     connect(action_select_all, &QAction::triggered, editor, &QTextEdit::selectAll);
 
@@ -134,25 +158,23 @@ void main_window::setup_edit_menu()
     // });
 }
 
-void main_window::setup_format_menu()
-{
-    auto* format_menu = menuBar()->addMenu("Format");
-    auto* text_case_menu = format_menu->addMenu("Text Case");
+void main_window::setup_format_menu() {
+    auto *format_menu = menuBar()->addMenu("Format");
+    auto *text_case_menu = format_menu->addMenu("Text Case");
 
-    for (const auto& transform : transforms) {
-        const auto* action = text_case_menu->addAction(QString::fromStdString(transform->name()));
+    for (const auto &transform: transforms) {
+        const auto *action = text_case_menu->addAction(QString::fromStdString(transform->name()));
         connect(action, &QAction::triggered, this, [this, &transform] {
             apply_transform(*transform);
         });
     }
 }
 
-void main_window::setup_format_toolbar()
-{
-    auto* toolbar = addToolBar("Format");
+void main_window::setup_format_toolbar() {
+    auto *toolbar = addToolBar("Format");
     toolbar->setIconSize(QSize(16, 16));
 
-    auto* action_bold = toolbar->addAction(QIcon("data/images/bold.svg"), "Bold");
+    auto *action_bold = toolbar->addAction(QIcon("data/images/bold.svg"), "Bold");
     action_bold->setCheckable(true);
     action_bold->setShortcut(QKeySequence("Ctrl+B"));
     connect(action_bold, &QAction::triggered, this, [this](const bool checked) {
@@ -161,7 +183,7 @@ void main_window::setup_format_toolbar()
         editor->mergeCurrentCharFormat(fmt);
     });
 
-    auto* action_italic = toolbar->addAction(QIcon("data/images/italic.svg"), "Italic");
+    auto *action_italic = toolbar->addAction(QIcon("data/images/italic.svg"), "Italic");
     action_italic->setCheckable(true);
     action_italic->setShortcut(QKeySequence("Ctrl+I"));
     connect(action_italic, &QAction::triggered, this, [this](const bool checked) {
@@ -170,7 +192,7 @@ void main_window::setup_format_toolbar()
         editor->mergeCurrentCharFormat(fmt);
     });
 
-    auto* action_underline = toolbar->addAction(QIcon("data/images/underline.svg"), "Underline");
+    auto *action_underline = toolbar->addAction(QIcon("data/images/underline.svg"), "Underline");
     action_underline->setCheckable(true);
     action_underline->setShortcut(QKeySequence("Ctrl+U"));
     connect(action_underline, &QAction::triggered, this, [this](const bool checked) {
@@ -180,36 +202,33 @@ void main_window::setup_format_toolbar()
     });
 
     connect(editor, &QTextEdit::currentCharFormatChanged,
-        this, [action_bold, action_italic, action_underline](const QTextCharFormat& fmt) {
-            action_bold->setChecked(fmt.fontWeight() == QFont::Bold);
-            action_italic->setChecked(fmt.fontItalic());
-            action_underline->setChecked(fmt.fontUnderline());
-        });
+            this, [action_bold, action_italic, action_underline](const QTextCharFormat &fmt) {
+                action_bold->setChecked(fmt.fontWeight() == QFont::Bold);
+                action_italic->setChecked(fmt.fontItalic());
+                action_underline->setChecked(fmt.fontUnderline());
+            });
 }
 
-void main_window::setup_search_menu()
-{
-    auto* search_menu = menuBar()->addMenu("Search");
+void main_window::setup_search_menu() {
+    auto *search_menu = menuBar()->addMenu("Search");
 
-    auto* action_find_replace = search_menu->addAction("Find / Replace...");
+    auto *action_find_replace = search_menu->addAction("Find / Replace...");
     action_find_replace->setShortcut(QKeySequence::Find);
     connect(action_find_replace, &QAction::triggered, this, [this] {
         show_find_replace_dialog();
     });
 }
 
-void main_window::setup_tools_menu()
-{
-    auto* tools_menu = menuBar()->addMenu("Tools");
+void main_window::setup_tools_menu() {
+    auto *tools_menu = menuBar()->addMenu("Tools");
 
-    const auto* action_word_freq = tools_menu->addAction("Word Frequency...");
+    const auto *action_word_freq = tools_menu->addAction("Word Frequency...");
     connect(action_word_freq, &QAction::triggered, this, [this] {
         show_word_frequency();
     });
 }
 
-void main_window::apply_transform(const text_transform& transform) const
-{
+void main_window::apply_transform(const text_transform &transform) const {
     auto cursor = editor->textCursor();
     if (!cursor.hasSelection()) {
         cursor.select(QTextCursor::Document);
@@ -230,11 +249,10 @@ void main_window::apply_transform(const text_transform& transform) const
     cursor.endEditBlock();
 }
 
-void main_window::open_file()
-{
+void main_window::open_file() {
     const auto path = QFileDialog::getOpenFileName(
-        this,
-        "Open File");
+            this,
+            "Open File");
 
     if (path.isEmpty()) {
         return;
@@ -246,7 +264,7 @@ void main_window::open_file()
 
         if (!file.exists()) {
             throw file_not_found_exception(
-                path.toStdString());
+                    path.toStdString());
         }
 
         if (!file.open(
@@ -254,7 +272,7 @@ void main_window::open_file()
                 | QIODevice::Text)) {
 
             throw file_read_exception(
-                path.toStdString());
+                    path.toStdString());
         }
 
         QTextStream in(&file);
@@ -265,27 +283,27 @@ void main_window::open_file()
             != QTextStream::Ok) {
 
             throw file_read_exception(
-                path.toStdString());
+                    path.toStdString());
         }
 
         editor->setPlainText(
-            contents);
+                contents);
 
         current_file = path;
 
         update_title();
 
     } catch (
-        const notepad_exception& ex) {
+            const notepad_exception &ex) {
 
         QMessageBox::critical(
-            this,
-            "Error",
-            ex.what());
+                this,
+                "Error",
+                ex.what());
     }
 }
-void main_window::save_file()
-{
+
+void main_window::save_file() {
     if (current_file.isEmpty()) {
         save_file_as();
         return;
@@ -300,7 +318,7 @@ void main_window::save_file()
                 | QIODevice::Text)) {
 
             throw file_write_exception(
-                current_file.toStdString());
+                    current_file.toStdString());
         }
 
         QTextStream out(&file);
@@ -308,17 +326,16 @@ void main_window::save_file()
         out << editor->toPlainText();
 
     } catch (
-        const notepad_exception& ex) {
+            const notepad_exception &ex) {
 
         QMessageBox::critical(
-            this,
-            "Error",
-            ex.what());
+                this,
+                "Error",
+                ex.what());
     }
 }
 
-void main_window::save_file_as()
-{
+void main_window::save_file_as() {
     const auto path = QFileDialog::getSaveFileName(this, "Save File As");
     if (path.isEmpty()) {
         return;
@@ -328,8 +345,7 @@ void main_window::save_file_as()
     update_title();
 }
 
-void main_window::update_title()
-{
+void main_window::update_title() {
     if (current_file.isEmpty()) {
         setWindowTitle("Notepad");
     } else {
@@ -339,8 +355,7 @@ void main_window::update_title()
 
 // TODO: bring the status bar management code from the previous assignments.
 
-void main_window::show_find_replace_dialog()
-{
+void main_window::show_find_replace_dialog() {
     if (!find_replace_dlg) {
         find_replace_dlg = new QDialog(this);
         find_replace_ui = std::make_unique<Ui::find_replace_dialog>();
@@ -355,21 +370,21 @@ void main_window::show_find_replace_dialog()
         };
 
         connect(find_replace_ui->find_next_button, &QPushButton::clicked,
-            find_replace_dlg, [this, current_flags] {
-                find_next(find_replace_ui->find_input->text(), current_flags());
-            });
+                find_replace_dlg, [this, current_flags] {
+                    find_next(find_replace_ui->find_input->text(), current_flags());
+                });
         connect(find_replace_ui->replace_button, &QPushButton::clicked,
-            find_replace_dlg, [this, current_flags] {
-                replace_current(find_replace_ui->find_input->text(),
-                    find_replace_ui->replace_input->text(), current_flags());
-            });
+                find_replace_dlg, [this, current_flags] {
+                    replace_current(find_replace_ui->find_input->text(),
+                                    find_replace_ui->replace_input->text(), current_flags());
+                });
         connect(find_replace_ui->replace_all_button, &QPushButton::clicked,
-            find_replace_dlg, [this, current_flags] {
-                replace_all(find_replace_ui->find_input->text(),
-                    find_replace_ui->replace_input->text(), current_flags());
-            });
+                find_replace_dlg, [this, current_flags] {
+                    replace_all(find_replace_ui->find_input->text(),
+                                find_replace_ui->replace_input->text(), current_flags());
+                });
         connect(find_replace_ui->close_button, &QPushButton::clicked,
-            find_replace_dlg, [this] { find_replace_dlg->hide(); });
+                find_replace_dlg, [this] { find_replace_dlg->hide(); });
     }
 
     find_replace_dlg->show();
@@ -377,8 +392,7 @@ void main_window::show_find_replace_dialog()
     find_replace_dlg->activateWindow();
 }
 
-void main_window::find_next(const QString& term, const QTextDocument::FindFlags flags) const
-{
+void main_window::find_next(const QString &term, const QTextDocument::FindFlags flags) const {
     if (term.isEmpty()) {
         return;
     }
@@ -393,9 +407,8 @@ void main_window::find_next(const QString& term, const QTextDocument::FindFlags 
     }
 }
 
-void main_window::replace_current(const QString& term, const QString& replacement,
-    const QTextDocument::FindFlags flags) const
-{
+void main_window::replace_current(const QString &term, const QString &replacement,
+                                  const QTextDocument::FindFlags flags) const {
     if (auto cursor = editor->textCursor(); cursor.hasSelection()) {
         cursor.insertText(replacement);
         editor->setTextCursor(cursor);
@@ -403,9 +416,8 @@ void main_window::replace_current(const QString& term, const QString& replacemen
     find_next(term, flags);
 }
 
-void main_window::replace_all(const QString& term, const QString& replacement,
-    const QTextDocument::FindFlags flags) const
-{
+void main_window::replace_all(const QString &term, const QString &replacement,
+                              const QTextDocument::FindFlags flags) const {
     if (term.isEmpty()) {
         return;
     }
@@ -425,8 +437,7 @@ void main_window::replace_all(const QString& term, const QString& replacement,
     }
 }
 
-void main_window::show_word_frequency()
-{
+void main_window::show_word_frequency() {
     const auto text = editor->toPlainText().toLower().toStdString();
 
     std::map<std::string, int> freq;
@@ -448,9 +459,9 @@ void main_window::show_word_frequency()
 
     std::vector<std::pair<std::string, int>> sorted_freq(freq.begin(), freq.end());
     std::sort(sorted_freq.begin(), sorted_freq.end(),
-        [](const auto& a, const auto& b) { return a.second > b.second; });
+              [](const auto &a, const auto &b) { return a.second > b.second; });
 
-    auto* dialog = new QDialog(this);
+    auto *dialog = new QDialog(this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     Ui::word_frequency_dialog ui;
     ui.setupUi(dialog);
@@ -460,9 +471,9 @@ void main_window::show_word_frequency()
 
     ui.frequency_table->setRowCount(static_cast<int>(sorted_freq.size()));
     for (int i = 0; i < static_cast<int>(sorted_freq.size()); ++i) {
-        const auto& [w, count] = sorted_freq[i];
+        const auto &[w, count] = sorted_freq[i];
         ui.frequency_table->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(w)));
-        auto* count_item = new QTableWidgetItem(QString::number(count));
+        auto *count_item = new QTableWidgetItem(QString::number(count));
         count_item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         ui.frequency_table->setItem(i, 1, count_item);
     }

@@ -36,6 +36,7 @@ private:
     void save_file();
     void save_file_as();
     void update_title();
+    void update_status_bar() const;
     void show_word_frequency() const;
 
     spell_checker checker;
