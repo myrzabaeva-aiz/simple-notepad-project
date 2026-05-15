@@ -62,13 +62,12 @@ main_window::main_window() {
             editor->document(),
             &checker);
 
-    // TODO: uncomment the line below after bringing code from the previous assignments.
-    // update_status_bar();
 
 
 }
 
-void main_window::update_status_bar() const {
+void main_window::update_status_bar() const
+{
     const QString text = editor->toPlainText();
 
     const int chars = text.length();
@@ -79,12 +78,21 @@ void main_window::update_status_bar() const {
 
     const int word_count = words.size();
 
-    statusBar()->showMessage(
-            QString("Words: %1 | Characters: %2")
-                    .arg(word_count)
-                    .arg(chars));
-}
+    QTextCursor cursor = editor->textCursor();
 
+    const int line =
+            cursor.blockNumber() + 1;
+
+    const int column =
+            cursor.positionInBlock() + 1;
+
+    statusBar()->showMessage(
+            QString("Words: %1 | Characters: %2 | Line: %3 | Column: %4")
+                    .arg(word_count)
+                    .arg(chars)
+                    .arg(line)
+                    .arg(column));
+}
 main_window::~main_window() = default;
 
 void main_window::setup_file_menu() {
@@ -153,10 +161,6 @@ void main_window::setup_edit_menu() {
     action_select_all->setShortcut(QKeySequence::SelectAll);
     connect(action_select_all, &QAction::triggered, editor, &QTextEdit::selectAll);
 
-    // TODO: uncomment the lines below after bringing code from the previous assignments.
-    // connect(editor, &QTextEdit::textChanged, this, [this] {
-    //     update_status_bar();
-    // });
 }
 
 void main_window::setup_format_menu() {
@@ -387,7 +391,6 @@ void main_window::update_title() {
     }
 }
 
-// TODO: bring the status bar management code from the previous assignments.
 
 void main_window::show_find_replace_dialog() {
     if (!find_replace_dlg) {
